@@ -1,4 +1,4 @@
-module github.com/midnightrun/hexagonal-architecture-url-shortner-example
+module github.com/midnightrun/hexagonal-architecture-url-shortener-example
 
 go 1.13
 
