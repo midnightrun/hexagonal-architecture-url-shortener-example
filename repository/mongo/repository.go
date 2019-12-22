@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/midnightrun/hexagonal-architecture-url-shortener-example/shortener"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
@@ -16,15 +17,27 @@ type mongoRepository struct {
 	timeout  time.Duration
 }
 
-func (m *mongoRepository) Find() {
+func (m *mongoRepository) Find(code string) (*shortener.Redirect, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), m.timeout)
+	defer cancel()
 
+	redirect := &shortener.Redirect{}
+	collection := m.client.Database(m.database).Collection("redirects")
+	filter := bson.M{"code": code}
+
+	err := collection.FindOne(ctx, filter).Decode(&redirect)
+	if err != nil {
+		return nil, err
+	}
+
+	return redirect, nil
 }
 
-func (m *mongoRepository) Find() {
-
+func (m *mongoRepository) Store(rediriect *shortener.Redirect) error {
+	return nil
 }
 
-func newMongoClient(mongoURL string, mongoTimeout time.Duration) (*mongo.Client, error) {
+func newMongoClient(mongoURL string, mongoTimeout int) (*mongo.Client, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(mongoTimeout)*time.Second)
 	defer cancel()
 
@@ -41,18 +54,18 @@ func newMongoClient(mongoURL string, mongoTimeout time.Duration) (*mongo.Client,
 	return client, err
 }
 
-func NewMongoRepository(mongoURL, mongoDB string, mongoTimeout time.Duration) (shortener.RedirectRepository, error) {
+func NewMongoRepository(mongoURL, mongoDB string, mongoTimeout int) (shortener.RedirectRepository, error) {
 	repository := &mongoRepository{
 		database: mongoDB,
 		timeout:  time.Duration(mongoTimeout) * time.Second,
 	}
 
-	client, err := newMongoClient(mongoURL, repository.timeout)
+	client, err := newMongoClient(mongoURL, mongoTimeout)
 	if err != nil {
 		return nil, err
 	}
 
 	repository.client = client
 
-	return client, nil
+	return repository, nil
 }
