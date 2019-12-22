@@ -1,6 +1,8 @@
 package redis
 
 import (
+	"fmt"
+
 	"github.com/go-redis/redis/v7"
 	"github.com/midnightrun/hexagonal-architecture-url-shortener-example/shortener"
 )
@@ -9,11 +11,15 @@ type redisReporitory struct {
 	client *redis.Client
 }
 
-func (r redisReporitory) Find(code string) (*shortener.Redirect, error) {
+func (r *redisReporitory) generateKey(code string) string {
+	return fmt.Sprintf("redirect:%s", code)
+}
+
+func (r *redisReporitory) Find(code string) (*shortener.Redirect, error) {
 	return nil, nil
 }
 
-func (r redisReporitory) Store(*shortener.Redirect) error {
+func (r *redisReporitory) Store(*shortener.Redirect) error {
 	return nil
 }
 
