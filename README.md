@@ -2,5 +2,5 @@
 
 ## Todo
 
-[] Use error wrap
-[] Write tests
+- [ ] Use error wrap
+- [ ] Write tests
