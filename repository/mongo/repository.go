@@ -33,7 +33,23 @@ func (m *mongoRepository) Find(code string) (*shortener.Redirect, error) {
 	return redirect, nil
 }
 
-func (m *mongoRepository) Store(rediriect *shortener.Redirect) error {
+func (m *mongoRepository) Store(redirect *shortener.Redirect) error {
+	ctx, cancel := context.WithTimeout(context.Background(), m.timeout)
+	defer cancel()
+
+	collection := m.client.Database(m.database).Collection("redirects")
+
+	_, err := collection.InsertOne(
+		ctx,
+		bson.M{
+			"code":       redirect.Code,
+			"url":        redirect.URL,
+			"created_at": redirect.CreatedAt,
+		})
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
