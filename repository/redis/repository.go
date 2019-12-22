@@ -2,6 +2,7 @@ package redis
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/go-redis/redis/v7"
 	"github.com/midnightrun/hexagonal-architecture-url-shortener-example/shortener"
@@ -16,7 +17,24 @@ func (r *redisReporitory) generateKey(code string) string {
 }
 
 func (r *redisReporitory) Find(code string) (*shortener.Redirect, error) {
-	return nil, nil
+	redirect := &shortener.Redirect{}
+	key := r.generateKey(code)
+
+	data, err := r.client.HGetAll(key).Result()
+	if err != nil {
+		return nil, err
+	}
+
+	createdAt, err := strconv.ParseInt(data["created_at"], 10, 64)
+	if err != nil {
+		return nil, err
+	}
+
+	redirect.Code = data["code"]
+	redirect.URL = data["url"]
+	redirect.CreatedAt = createdAt
+
+	return redirect, nil
 }
 
 func (r *redisReporitory) Store(*shortener.Redirect) error {
