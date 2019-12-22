@@ -25,6 +25,10 @@ func (r *redisReporitory) Find(code string) (*shortener.Redirect, error) {
 		return nil, err
 	}
 
+	if len(data) == 0 {
+		return nil, shortener.ErrRedirectNotFound
+	}
+
 	createdAt, err := strconv.ParseInt(data["created_at"], 10, 64)
 	if err != nil {
 		return nil, err
@@ -37,7 +41,19 @@ func (r *redisReporitory) Find(code string) (*shortener.Redirect, error) {
 	return redirect, nil
 }
 
-func (r *redisReporitory) Store(*shortener.Redirect) error {
+func (r *redisReporitory) Store(redirect *shortener.Redirect) error {
+	key := r.generateKey(redirect.Code)
+	data := map[string]interface{}{
+		"code":       redirect.Code,
+		"url":        redirect.URL,
+		"created_at": redirect.CreatedAt,
+	}
+
+	_, err := r.client.HMSet(key, data).Result()
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
