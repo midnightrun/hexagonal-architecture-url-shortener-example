@@ -9,6 +9,14 @@ type redisReporitory struct {
 	client *redis.Client
 }
 
+func (r redisReporitory) Find(code string) (*shortener.Redirect, error) {
+	return nil, nil
+}
+
+func (r redisReporitory) Store(*shortener.Redirect) error {
+	return nil
+}
+
 func newRedisClient(redisURL string) (*redis.Client, error) {
 	opts, err := redis.ParseURL(redisURL)
 	if err != nil {
@@ -34,5 +42,6 @@ func NewRedisRepository(redisURL string) (shortener.RedirectRepository, error) {
 	}
 
 	repository.client = client
+
 	return repository, nil
 }
