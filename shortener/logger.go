@@ -22,7 +22,7 @@ type Logger interface {
 	Infof(format string, args ...interface{})
 	Panicf(format string, args ...interface{})
 	Warnf(format string, args ...interface{})
-	WithFields(keyValues Fields)
+	WithFields(keyValues Fields) Logger
 }
 
 type Configuration struct {
@@ -32,5 +32,5 @@ type Configuration struct {
 	EnableFile        bool
 	FileJSONFormat    bool
 	FileLevel         string
-	FileLovation      string
+	FileLocation      string
 }

@@ -25,4 +25,5 @@ require (
 	golang.org/x/tools v0.0.0-20191224055732-dd894d0a8a40 // indirect
 	google.golang.org/appengine v1.6.5 // indirect
 	gopkg.in/dealancer/validate.v2 v2.1.0
+	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 )

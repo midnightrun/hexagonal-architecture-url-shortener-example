@@ -1,10 +1,13 @@
 package zap
 
 import (
+	"os"
+
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
 	"github.com/midnightrun/hexagonal-architecture-url-shortener-example/shortener"
+	lumberjack "gopkg.in/natefinch/lumberjack.v2"
 )
 
 type zapLogger struct {
@@ -39,6 +42,69 @@ func getZapLevel(level string) zapcore.Level {
 	}
 }
 
-func newZapLogger(config shortener.Configuration) (logger shortener.Logger, error) {
+func newZapLogger(config shortener.Configuration) (shortener.Logger, error) {
+	cores := []zapcore.Core{}
 
+	if config.EnableConsole {
+		level := getZapLevel(config.ConsoleLevel)
+		writer := zapcore.Lock(os.Stdout)
+		core := zapcore.NewCore(getEncoder(config.FileJSONFormat), writer, level)
+		cores = append(cores, core)
+	}
+
+	if config.EnableFile {
+		level := getZapLevel(config.FileLevel)
+		writer := zapcore.AddSync(&lumberjack.Logger{
+			Filename: config.FileLocation,
+			MaxSize:  100,
+			Compress: true,
+			MaxAge:   28,
+		})
+		core := zapcore.NewCore(getEncoder(config.FileJSONFormat), writer, level)
+		cores = append(cores, core)
+	}
+
+	combinedCore := zapcore.NewTee(cores...)
+
+	logger := zap.New(combinedCore,
+		zap.AddCallerSkip(2),
+		zap.AddCaller(),
+	).Sugar()
+
+	return &zapLogger{
+		sugaredLogger: logger,
+	}, nil
+}
+
+func (l *zapLogger) Debugf(format string, args ...interface{}) {
+	l.sugaredLogger.Debugf(format, args)
+}
+
+func (l *zapLogger) Fatalf(format string, args ...interface{}) {
+	l.sugaredLogger.Fatalf(format, args)
+}
+
+func (l *zapLogger) Infof(format string, args ...interface{}) {
+	l.sugaredLogger.Infof(format, args)
+}
+
+func (l *zapLogger) Panicf(format string, args ...interface{}) {
+	l.sugaredLogger.Panicf(format, args)
+}
+
+func (l *zapLogger) Warnf(format string, args ...interface{}) {
+	l.sugaredLogger.Warnf(format, args)
+}
+
+func (l *zapLogger) WithFields(keyValues shortener.Fields) shortener.Logger {
+	f := make([]interface{}, 0)
+
+	for k, v := range keyValues {
+		f = append(f, k)
+		f = append(f, v)
+	}
+
+	newLogger := l.sugaredLogger.With(f...)
+
+	return &zapLogger{newLogger}
 }
