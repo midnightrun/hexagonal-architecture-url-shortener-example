@@ -2,8 +2,6 @@ package shortener
 
 import "errors"
 
-var log Logger
-
 type Fields map[string]interface{}
 
 const (
@@ -12,11 +10,6 @@ const (
 	Warn  = "warn"
 	Error = "error"
 	Fatal = "fatal"
-)
-
-const (
-	InstanceZapLogger int = iota
-	InstanceLogrusLogger
 )
 
 var (
