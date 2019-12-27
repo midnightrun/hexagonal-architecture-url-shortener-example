@@ -28,7 +28,7 @@ func getFormatter(isJSON bool) logrus.Formatter {
 	}
 }
 
-func NewLogrusLogger(config shortener.Configuration) (Logger, error) {
+func NewLogrusLogger(config shortener.Configuration) (shortener.Logger, error) {
 	logLevel := config.ConsoleLevel
 
 	if logLevel == "" {
