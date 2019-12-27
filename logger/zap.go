@@ -42,7 +42,7 @@ func getZapLevel(level string) zapcore.Level {
 	}
 }
 
-func newZapLogger(config shortener.Configuration) (shortener.Logger, error) {
+func NewZapLogger(config shortener.Configuration) (shortener.Logger, error) {
 	cores := []zapcore.Core{}
 
 	if config.EnableConsole {
