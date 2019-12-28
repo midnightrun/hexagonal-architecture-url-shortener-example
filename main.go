@@ -13,6 +13,8 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	h "github.com/midnightrun/hexagonal-architecture-url-shortener-example/api"
+	ll "github.com/midnightrun/hexagonal-architecture-url-shortener-example/logger/logrus"
+	zl "github.com/midnightrun/hexagonal-architecture-url-shortener-example/logger/zap"
 	mr "github.com/midnightrun/hexagonal-architecture-url-shortener-example/repository/mongo"
 	rr "github.com/midnightrun/hexagonal-architecture-url-shortener-example/repository/redis"
 	"github.com/midnightrun/hexagonal-architecture-url-shortener-example/shortener"
@@ -55,9 +57,43 @@ func chooseRepo() shortener.RedirectRepository {
 	return nil
 }
 
+func chooseLogger() shortener.Logger {
+	config := shortener.Configuration{
+		EnableConsole:     true,
+		ConsoleLevel:      shortener.Debug,
+		ConsoleJSONFormat: true,
+		EnableFile:        true,
+		FileLevel:         shortener.Info,
+		FileJSONFormat:    true,
+		FileLocation:      "log.log",
+	}
+
+	var logger shortener.Logger
+
+	var err error
+
+	switch strings.ToLower(os.Getenv("LOGGER")) {
+	case "zap":
+		logger, err = zl.NewZapLogger(config)
+		if err != nil {
+			return nil
+		}
+	case "logrus":
+		logger, err = ll.NewLogrusLogger(config)
+		if err != nil {
+			return nil
+		}
+	}
+
+	contextLogger := logger.WithFields(shortener.Fields{"key1": "value1"})
+
+	return contextLogger
+}
+
 func main() {
 	fmt.Println("Hexagonal URL Shortener")
 
+	log := chooseLogger()
 	repo := chooseRepo()
 	service := shortener.NewRedirectService(repo)
 	handler := h.NewHandler(service)
@@ -74,6 +110,7 @@ func main() {
 	errs := make(chan error, 2)
 
 	go func() {
+		log.WithFields().Infof()
 		fmt.Println("Listening on port: ", httpPort())
 		errs <- http.ListenAndServe(httpPort(), r)
 	}()
