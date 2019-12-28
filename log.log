@@ -1,0 +1,17 @@
+{"level":"info","msg":"Logrus Logger activated","time":"2019-12-28T20:06:55+01:00"}
+{"level":"info","msg":"Starting URL Shortener Service","time":"2019-12-28T20:06:55+01:00"}
+{"level":"info","msg":"Logrus Logger activated","time":"2019-12-28T20:22:21+01:00"}
+{"level":"info","msg":"Starting URL Shortener Service","time":"2019-12-28T20:22:21+01:00"}
+{"level":"info","msg":"Listening on port: %!(EXTRA string=8000)","time":"2019-12-28T20:22:21+01:00"}
+{"level":"info","msg":"Listening on port: %!(EXTRA string=8000)","time":"2019-12-28T20:22:21+01:00"}
+{"level":"info","msg":"Logrus Logger activated","time":"2019-12-28T20:23:55+01:00"}
+{"level":"info","msg":"Starting URL Shortener Service","time":"2019-12-28T20:23:55+01:00"}
+{"level":"info","msg":"Listening on port: 8000","time":"2019-12-28T20:23:55+01:00"}
+{"level":"info","msg":"Listening on port: 8000","time":"2019-12-28T20:23:55+01:00"}
+{"level":"info","msg":"Logrus Logger activated","time":"2019-12-28T20:25:13+01:00"}
+{"level":"info","msg":"Starting URL Shortener Service","time":"2019-12-28T20:25:13+01:00"}
+{"level":"info","msg":"Listening on port: 8000","time":"2019-12-28T20:25:13+01:00"}
+{"level":"info","msg":"Logrus Logger activated","time":"2019-12-28T20:36:25+01:00"}
+{"level":"warning","msg":"No Repository found","time":"2019-12-28T20:36:25+01:00"}
+{"level":"info","msg":"Starting URL Shortener Service","time":"2019-12-28T20:36:25+01:00"}
+{"level":"info","msg":"Listening on port: 8000","time":"2019-12-28T20:36:25+01:00"}

@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -20,12 +19,18 @@ import (
 	"github.com/midnightrun/hexagonal-architecture-url-shortener-example/shortener"
 )
 
+var (
+	log shortener.Logger
+)
+
 func httpPort() string {
 	port := "8000"
 
 	if os.Getenv("PORT") != "" {
 		port = os.Getenv("PORT")
 	}
+
+	log.Infof("Listening on port: %s", port)
 
 	return fmt.Sprintf(":%s", port)
 }
@@ -37,8 +42,10 @@ func chooseRepo() shortener.RedirectRepository {
 
 		repo, err := rr.NewRedisRepository(redisURL)
 		if err != nil {
-			log.Fatal(err)
+			log.Fatalf("chooseRepo: %s", err)
 		}
+
+		log.Infof("Redis Repository activated")
 
 		return repo
 	case "mongo":
@@ -48,11 +55,15 @@ func chooseRepo() shortener.RedirectRepository {
 
 		repo, err := mr.NewMongoRepository(mongoURL, mongoDB, mongoTimeout)
 		if err != nil {
-			log.Fatal(err)
+			log.Fatalf("chooseRepo: %s", err)
 		}
+
+		log.Infof("MongoDB Repository activated")
 
 		return repo
 	}
+
+	log.Warnf("No Repository found")
 
 	return nil
 }
@@ -68,35 +79,37 @@ func chooseLogger() shortener.Logger {
 		FileLocation:      "log.log",
 	}
 
-	var logger shortener.Logger
+	var log shortener.Logger
 
 	var err error
 
 	switch strings.ToLower(os.Getenv("LOGGER")) {
 	case "zap":
-		logger, err = zl.NewZapLogger(config)
+		log, err = zl.NewZapLogger(config)
 		if err != nil {
 			return nil
 		}
-	case "logrus":
-		logger, err = ll.NewLogrusLogger(config)
+
+		log.Infof("Zap Logger activated")
+	default:
+		log, err = ll.NewLogrusLogger(config)
 		if err != nil {
 			return nil
 		}
+
+		log.Infof("Logrus Logger activated")
 	}
 
-	contextLogger := logger.WithFields(shortener.Fields{"key1": "value1"})
-
-	return contextLogger
+	return log
 }
 
 func main() {
 	fmt.Println("Hexagonal URL Shortener")
 
-	log := chooseLogger()
+	log = chooseLogger()
 	repo := chooseRepo()
 	service := shortener.NewRedirectService(repo)
-	handler := h.NewHandler(service)
+	handler := h.NewHandler(service, log)
 
 	r := chi.NewRouter()
 	r.Use(middleware.RequestID)
@@ -110,8 +123,7 @@ func main() {
 	errs := make(chan error, 2)
 
 	go func() {
-		log.WithFields().Infof()
-		fmt.Println("Listening on port: ", httpPort())
+		log.Infof("Starting URL Shortener Service")
 		errs <- http.ListenAndServe(httpPort(), r)
 	}()
 
