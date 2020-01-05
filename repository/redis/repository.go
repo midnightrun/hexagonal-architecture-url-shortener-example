@@ -8,15 +8,15 @@ import (
 	"github.com/midnightrun/hexagonal-architecture-url-shortener-example/shortener"
 )
 
-type redisReporitory struct {
+type redisRepository struct {
 	client *redis.Client
 }
 
-func (r *redisReporitory) generateKey(code string) string {
+func (r *redisRepository) generateKey(code string) string {
 	return fmt.Sprintf("redirect:%s", code)
 }
 
-func (r *redisReporitory) Find(code string) (*shortener.Redirect, error) {
+func (r *redisRepository) Find(code string) (*shortener.Redirect, error) {
 	redirect := &shortener.Redirect{}
 	key := r.generateKey(code)
 
@@ -41,7 +41,7 @@ func (r *redisReporitory) Find(code string) (*shortener.Redirect, error) {
 	return redirect, nil
 }
 
-func (r *redisReporitory) Store(redirect *shortener.Redirect) error {
+func (r *redisRepository) Store(redirect *shortener.Redirect) error {
 	key := r.generateKey(redirect.Code)
 	data := map[string]interface{}{
 		"code":       redirect.Code,
@@ -74,7 +74,7 @@ func newRedisClient(redisURL string) (*redis.Client, error) {
 }
 
 func NewRedisRepository(redisURL string) (shortener.RedirectRepository, error) {
-	repository := &redisReporitory{}
+	repository := &redisRepository{}
 
 	client, err := newRedisClient(redisURL)
 	if err != nil {
