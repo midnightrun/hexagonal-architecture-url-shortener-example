@@ -48,7 +48,7 @@ func (m *mongoRepository) Store(redirect *shortener.Redirect) error {
 			"created_at": redirect.CreatedAt,
 		})
 	if err != nil {
-		return err
+		return fmt.Errorf("MongoRepository Store: %v -> %w", collection, err)
 	}
 
 	return nil
@@ -65,7 +65,7 @@ func newMongoClient(mongoURL string, mongoTimeout int) (*mongo.Client, error) {
 
 	err = client.Ping(ctx, readpref.Primary())
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("MongoRepository newMongoClient: %v -> %w", client, err)
 	}
 
 	return client, err
@@ -79,7 +79,7 @@ func NewMongoRepository(mongoURL, mongoDB string, mongoTimeout int) (shortener.R
 
 	client, err := newMongoClient(mongoURL, mongoTimeout)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("MongoRepository NewMongoRepository: %v -> %w", client, err)
 	}
 
 	repository.client = client
