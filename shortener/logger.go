@@ -1,7 +1,5 @@
 package shortener
 
-import "errors"
-
 type Fields map[string]interface{}
 
 const (
@@ -10,10 +8,6 @@ const (
 	Warn  = "warn"
 	Error = "error"
 	Fatal = "fatal"
-)
-
-var (
-	errInvalidLoggerInstace = errors.New("invalid logger instance")
 )
 
 type Logger interface {
@@ -28,9 +22,9 @@ type Logger interface {
 type Configuration struct {
 	EnableConsole     bool
 	ConsoleJSONFormat bool
-	ConsoleLevel      string
 	EnableFile        bool
 	FileJSONFormat    bool
 	FileLevel         string
 	FileLocation      string
+	ConsoleLevel      string
 }
