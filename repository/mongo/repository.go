@@ -2,6 +2,7 @@ package mongo
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/midnightrun/hexagonal-architecture-url-shortener-example/shortener"
@@ -27,7 +28,7 @@ func (m *mongoRepository) Find(code string) (*shortener.Redirect, error) {
 
 	err := collection.FindOne(ctx, filter).Decode(&redirect)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("MongoRepository FindOne: %v -> %w", collection, err)
 	}
 
 	return redirect, nil

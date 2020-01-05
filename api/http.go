@@ -40,6 +40,7 @@ func (h *handler) Get(w http.ResponseWriter, r *http.Request) {
 		if err == shortener.ErrRedirectNotFound {
 			http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 			log.Warnf("Get handler: %s", err)
+
 			return
 		}
 
@@ -53,6 +54,8 @@ func (h *handler) Get(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *handler) Post(w http.ResponseWriter, r *http.Request) {
+	log.Infof("Post handler triggered")
+
 	contentType := r.Header.Get("Content-Type")
 	requestBody, err := ioutil.ReadAll(r.Body)
 
@@ -76,6 +79,7 @@ func (h *handler) Post(w http.ResponseWriter, r *http.Request) {
 		if err == shortener.ErrReadirectInvalid {
 			http.Error(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 			log.Warnf("Post handler: %s", err)
+
 			return
 		}
 
