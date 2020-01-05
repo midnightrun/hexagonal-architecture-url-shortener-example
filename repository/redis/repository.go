@@ -22,16 +22,16 @@ func (r *redisReporitory) Find(code string) (*shortener.Redirect, error) {
 
 	data, err := r.client.HGetAll(key).Result()
 	if err != nil {
-		return nil, fmt.Errorf("RedisRepository Find %v -> %w", data, err)
+		return nil, fmt.Errorf("RedisRepository Find: %v -> %w", data, err)
 	}
 
 	if len(data) == 0 {
-		return nil, fmt.Errorf("RedisRepository Find %v -> %w", data, shortener.ErrRedirectNotFound)
+		return nil, fmt.Errorf("RedisRepository Find: %v -> %w", data, shortener.ErrRedirectNotFound)
 	}
 
 	createdAt, err := strconv.ParseInt(data["created_at"], 10, 64)
 	if err != nil {
-		return nil, fmt.Errorf("RedisRepository Find %v -> %w", createdAt, err)
+		return nil, fmt.Errorf("RedisRepository Find: %v -> %w", createdAt, err)
 	}
 
 	redirect.Code = data["code"]
@@ -51,7 +51,7 @@ func (r *redisReporitory) Store(redirect *shortener.Redirect) error {
 
 	_, err := r.client.HMSet(key, data).Result()
 	if err != nil {
-		return fmt.Errorf("RedisRepository Store %v -> %w", data, err)
+		return fmt.Errorf("RedisRepository Store: %v -> %w", data, err)
 	}
 
 	return nil
@@ -67,7 +67,7 @@ func newRedisClient(redisURL string) (*redis.Client, error) {
 
 	_, err = client.Ping().Result()
 	if err != nil {
-		return nil, fmt.Errorf("RedisRepository newRedisClient %v -> %w", client, err)
+		return nil, fmt.Errorf("RedisRepository newRedisClient: %v -> %w", client, err)
 	}
 
 	return client, nil
@@ -78,7 +78,7 @@ func NewRedisRepository(redisURL string) (shortener.RedirectRepository, error) {
 
 	client, err := newRedisClient(redisURL)
 	if err != nil {
-		return nil, fmt.Errorf("RedisRepository NewRedisRepository %v -> %w", client, err)
+		return nil, fmt.Errorf("RedisRepository NewRedisRepository: %v -> %w", client, err)
 	}
 
 	repository.client = client

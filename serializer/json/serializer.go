@@ -11,6 +11,7 @@ type Redirect struct{}
 func (r *Redirect) Decode(input []byte) (*shortener.Redirect, error) {
 	redirect := &shortener.Redirect{}
 	if err := json.Unmarshal(input, &redirect); err != nil {
+		return nil, fmt.Errorf("JSON Serializer: 
 		return nil, err
 	}
 
